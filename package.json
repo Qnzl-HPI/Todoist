@@ -1,0 +1,20 @@
+{
+  "name": "@hpi/todoist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "todoist": "bin/todoist.js"
+  },
+  "scripts": {
+    "build": "pkg bin/todoist.js --out-path pkg/"
+  },
+  "author": "Madeline Cameron <maddie@qnzl.co>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^7.1.0",
+    "dayjs": "^1.10.4",
+    "node-fetch": "^2.6.0",
+    "server": "^1.0.32"
+  }
+}
