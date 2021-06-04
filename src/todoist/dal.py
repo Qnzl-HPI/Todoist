@@ -18,19 +18,36 @@ class DAL:
     def __init__(self, sources: Sequence[PathIsh]) -> None:
         self.sources = [p if isinstance(p, Path) else Path(p) for p in sources]
 
-
     def raw(self):
         for f in sorted(self.sources):
             with f.open(encoding="utf-8") as fo:
                 yield json.load(fo)
 
-    def projects(self) -> Iterator[Res[Json]]:
-      for r in self.raw():
-          yield r['projects']
+    def latest(self):
+      latest_file = sorted(self.sources)[-1]
 
-    def tasks(self) -> Iterator[Res[Json]]:
-      for r in self.raw():
-          yield r['tasks']
+      with latest_file.open(encoding="utf-8") as fo:
+          return json.load(fo)
+
+    def projects(self) -> Iterator[Res[Json]]:
+      latest_file = self.latest()
+      yield latest_file['projects']
+
+    def tasks(self, id: str) -> Iterator[Res[Json]]:
+      latest_file = self.latest()
+      yield latest_file['tasks']
+
+    def completed(self, since: str, until: str, id: str) -> Iterator[Res[Json]]:
+      latest_file = self.latest()
+      for t in latest_file['tasks']:
+        if t['completed']:
+          yield t
+
+    def activity(self, id: str) -> Iterator[Res[Json]]:
+      pass
+
+    def taskComment(self, id: str) -> Iterator[Res[Json]]:
+      pass
 
 if __name__ == '__main__':
     dal_helper.main(DAL=DAL)
