@@ -152,9 +152,56 @@ async function dump({
     return onfatal(e)
   }
 
+  let activity
+  try {
+    console.log('getting activity')
+
+    const response = await fetch('https://api.todoist.com/sync/v8/activity/get', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+
+    activity = await response.json()
+  } catch (e) {
+    return onfatal(e)
+  }
+
+
   console.log(`assigning project names to ${tasks.length} tasks from ${projects.length} projects`)
   for (const project of projects) {
+    try {
+      console.log(`getting comments for project ${project.id}`)
+
+      const response = await fetch(`https://api.todoist.com/rest/v1/comments?project_id=${project.id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+
+      project.comments = await response.json()
+    } catch (e) {
+      return onfatal(e)
+    }
+
     for (const task of tasks) {
+      try {
+        console.log(`getting comments for task ${task.id}`)
+
+        const response = await fetch(`https://api.todoist.com/rest/v1/comments?task_id=${task.id}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+        task.comments = await response.json()
+      } catch (e) {
+        return onfatal(e)
+      }
+
       if (project.id == task.project_id) {
         task.projectName = project.name
       }
@@ -168,6 +215,7 @@ async function dump({
 
   const dump = JSON.stringify({
     projects,
+    activity,
     tasks,
   })
 

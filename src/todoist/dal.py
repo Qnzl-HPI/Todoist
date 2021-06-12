@@ -15,6 +15,7 @@ def get_logger():
     return logging_helper.logger('todoist')
 
 class DAL:
+    ## TODO Allow selecting arbitrary dated file
     def __init__(self, sources: Sequence[PathIsh]) -> None:
         self.sources = [p if isinstance(p, Path) else Path(p) for p in sources]
 
@@ -43,11 +44,22 @@ class DAL:
         if t['completed']:
           yield t
 
-    def activity(self, id: str) -> Iterator[Res[Json]]:
-      pass
+    def activity(self, _id: str) -> Iterator[Res[Json]]:
+      latest_file = self.latest()
+      if _id:
+        for t in latest_file['activity']['events']:
+          if str(t['object_id']) == str(_id):
+            yield t
+      else:
+        yield latest_file['activity']
 
-    def taskComment(self, id: str) -> Iterator[Res[Json]]:
-      pass
+    def taskComment(self, _id: str) -> Iterator[Res[Json]]:
+      latest_file = self.latest()
+      for t in latest_file['tasks']:
+        if _id and str(t['id']) == str(_id):
+          yield t['comments']
+        elif not _id:
+          yield t['comments']
 
 if __name__ == '__main__':
     dal_helper.main(DAL=DAL)
