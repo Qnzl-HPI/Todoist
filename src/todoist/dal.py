@@ -48,7 +48,7 @@ class DAL:
       latest_file = self.latest()
       if _id:
         for t in latest_file['activity']['events']:
-          if str(t['object_id']) == str(_id):
+          if str(t['id']) == str(_id):
             yield t
       else:
         yield latest_file['activity']
